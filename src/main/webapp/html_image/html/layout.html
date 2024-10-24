@@ -101,26 +101,20 @@
             flex: 1;
             padding: 20px;
             position: relative;
-            overflow-y: auto; /* 메인 콘텐츠에서 스크롤이 가능하게 설정 */
+            overflow-y: auto;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .page-card {
             display: none;
             width: 100%;
-            min-height: 100%; /* 페이지 카드의 높이를 부모 요소에 맞추어 설정 */
+            min-height: 100%;
             padding: 20px;
-            background-color: white;
-            overflow-y: auto; /* 페이지 카드 내에서 스크롤 가능 */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .page-card-home {
-            display: none;
-            width: 100%;
-            min-height: 100%; /* 페이지 카드의 높이를 부모 요소에 맞추어 설정 */
-            /* padding: 20px; */
-            background-color: white;
-            overflow-y: auto; /* 페이지 카드 내에서 스크롤 가능 */
+            background-color: transparent;
+            overflow-y: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -163,18 +157,29 @@
     </style>
 
     <script>
-        // 페이지를 로드하고 카드를 동적으로 생성하는 함수
+        function setMainBackground(showImage) {
+            const mainContent = document.querySelector('main');
+            if (showImage) {
+                // 홈 페이지에서는 배경 이미지 표시
+                mainContent.style.backgroundImage = "url('../image/home-background.jpg')";
+                mainContent.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            } else {
+                // 다른 페이지에서는 배경 이미지 제거
+                mainContent.style.backgroundImage = "none";
+                mainContent.style.backgroundColor = "#ffffff"; // 다른 페이지에서는 흰색 배경
+            }
+        }
+
         function loadPage(pageId, pageUrl) {
             const mainContent = document.querySelector('main');
             const existingPage = document.getElementById(pageId);
 
-            // 이미 로드된 페이지가 있으면 그 페이지를 활성화
             if (existingPage) {
                 setActivePage(pageId);
+                setMainBackground(pageId === 'home'); // 홈 페이지인지 확인하고 배경 이미지 설정
                 return;
             }
 
-            // 새로운 page-card 생성
             fetch(pageUrl)
                 .then(response => response.text())
                 .then(data => {
@@ -184,25 +189,22 @@
                     newPageCard.innerHTML = data;
                     mainContent.appendChild(newPageCard);
                     setActivePage(pageId);
-                    adjustPaddingForHome(pageId); 
+                    setMainBackground(pageId === 'home'); // 홈 페이지인지 확인하고 배경 이미지 설정
                 })
                 .catch(error => {
                     console.error('페이지 로드 중 오류 발생:', error);
                 });
         }
-        
-     // padding을 home 페이지일 때만 0으로 설정하는 함수
+
         function adjustPaddingForHome(pageId) {
             const pageElement = document.getElementById(pageId);
-            
             if (pageId === 'home') {
-                pageElement.style.padding = '0px';  // home 페이지의 padding을 0으로 설정
+                pageElement.style.padding = '0px';
             } else {
-                pageElement.style.padding = '20px';  // 다른 페이지의 padding을 기본값으로 설정
+                pageElement.style.padding = '20px';
             }
         }
 
-        // 특정 페이지를 활성화하는 함수
         function setActivePage(pageId) {
             const pages = document.querySelectorAll('.page-card');
             pages.forEach(page => {
@@ -212,17 +214,15 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
-                localStorage.setItem('currentPage', pageId); // 현재 페이지 상태 저장
+                localStorage.setItem('currentPage', pageId);
             }
         }
 
-        // 서브메뉴 토글 함수
         function toggleSubmenu() {
             const submenu = document.getElementById('submenu');
             submenu.classList.toggle('active');
         }
 
-        // 메뉴 접기/펼치기 버튼 동작
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar-container');
             sidebar.classList.toggle('hidden');
@@ -230,12 +230,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            loadPage('home', 'home.html'); // 기본 페이지를 로드
+            loadPage('home', 'home.html'); // 기본적으로 홈 페이지 로드
         });
     </script>
 </head>
 <body>
-
     <header>
         <button onclick="toggleSidebar()">☰</button>
         <span>kim_woojin01</span>
@@ -265,6 +264,5 @@
     <footer>
         © 2024 내 웹사이트 - 모든 권리 보유
     </footer>
-
 </body>
 </html>
